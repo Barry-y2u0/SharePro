@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <header th:fragment="header">
+        <div class="container-fluid">
+            <div class="camera_wrap" id="camera_wrap">
+                <div data-src="/images/img1.jpg"></div>
+                <div data-src="/images/img2.jpg"></div>
+                <div data-src="/images/img3.jpg"></div>
+            </div>
+            <script>
+                _$_camera(function () {
+                    $("#camera_wrap").camera({
+                        height: '600',
+                        loader: 'bar',
+                        pagination: false,
+                        thumbnails: false,
+                        hover: false,
+                        opacityOnGrid: false
+                    });
+                })
+            </script>
+        </div>
+        <div class="head-box">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h2 class="text-center text-uppercase last">Lorem ipsum dolor sit amet consectetur </h2>
+                        <p class="text-center last">Lorem ipsum dolor sit amet in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                        <div class="search-panel">
+                            <form class="form-inline" role="form">
+                                <div class="form-group">
+                                    <input id="dity" type="text" class="form-control" placeholder="City" autocomplete="off"/>
+                                </div>
+                                <div class="form-group hidden-xs adv">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">$</div>
+                                        <input class="form-control price" type="text" placeholder="From">
+                                    </div>
+                                </div>
+                                <div class="form-group hidden-xs adv">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">$</div>
+                                        <input class="form-control price" type="text" placeholder="To">
+                                    </div>
+                                </div>
+                                <div class="form-group hidden-xs adv">
+                                    <div class="checkbox custom-checkbox"><label><input type="checkbox"><span class="fa fa-check"></span> For Rent</label></div>
+                                </div>
+                                <div class="form-group hidden-xs adv">
+                                    <div class="checkbox custom-checkbox"><label><input type="checkbox"><span class="fa fa-check"></span> For Sale</label></div>
+                                </div>
+                                <div class="form-group">
+                                    <a href="" class="btn btnsearch">Search</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div th:fragment="header-nav" class="header-nav">
+        <div class="container">
+            <div class="header-nav-bottom">
+                <nav class="navbar navbar-default">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                    </div>
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse nav-wil" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                            <li class="active"><a href="layout.html" class="hvr-bounce-to-bottom">Home</a></li>
+                            <li><a href="about.html" class="hvr-bounce-to-bottom">About</a></li>
+                            <li><a href="news.html" class="hvr-bounce-to-bottom">News & Events</a></li>
+                            <li><a href="gallery.html" class="hvr-bounce-to-bottom">Photo Gallery</a></li>
+                            <li><a href="contact.html" class="hvr-bounce-to-bottom">Contact Us</a></li>
+                        </ul>
+                    </div><!-- /.navbar-collapse -->
+                </nav>
+            </div>
+        </div>
+    </div>
+</html>
