@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  * Created by PC-HT on 2017/12/13.
  * 利用AOP切面实现数据源的动态切换
  */
-@Aspect
+@Aspect//使之成为切面类
 @Order(2)// 保证该AOP在@Transactional之前执行
 @Component
 public class DynamicDataSourceAspect {

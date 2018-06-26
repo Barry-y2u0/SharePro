@@ -10,6 +10,7 @@ import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSource
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
+import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,11 @@ import pers.yxb.share.sharemodel.entity.SysRole;
 import pers.yxb.share.sharemodel.entity.SysUser;
 import pers.yxb.share.sharemodel.service.ISysUserService;
 
+import javax.servlet.Filter;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -30,8 +36,8 @@ import java.util.Map;
 /**
  * Created by PC-HT on 2017/12/11.
  */
-/*@Configuration
-@Order(1)*/
+@Configuration
+@Order(1)
 public class ShiroConfig {
     private static final Logger logger = LoggerFactory.getLogger(ShiroConfig.class);
 
@@ -43,6 +49,38 @@ public class ShiroConfig {
 
     @Value("${shiro.errorUrl}")
     private String errorUrl;
+
+    /**
+     * Shiro入口过滤器
+     * @param securityManager
+     * @return
+     */
+    @Bean(name = "shiroFilter")
+    public ShiroFilterFactoryBean getShiroFilterFactoryBean(DefaultWebSecurityManager securityManager) {
+        ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
+        shiroFilterFactoryBean.setSecurityManager(securityManager);// 必须设置 SecurityManager
+        logger.info("loginUrl:" + loginUrl);
+        shiroFilterFactoryBean.setLoginUrl(loginUrl);// 如果不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面
+        shiroFilterFactoryBean.setSuccessUrl(successUrl);// 登录成功后要跳转的连接
+        shiroFilterFactoryBean.setUnauthorizedUrl(errorUrl);
+
+        Map<String, Filter> filters = shiroFilterFactoryBean.getFilters();
+        filters.put("authc",myFormAuthenticationFilter());
+        shiroFilterFactoryBean.setFilters(filters);
+
+        Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
+        // authc：该过滤器下的页面必须验证后才能访问，它是Shiro内置的一个拦截器org.apache.shiro.web.filter.authc.FormAuthenticationFilter
+        logger.info("##################从数据库读取权限规则，加载到shiroFilter中##################");
+        filterChainDefinitionMap.put("/favicon.ico", "anon");
+        filterChainDefinitionMap.put("/login", "authc");
+        filterChainDefinitionMap.put("/logout", "logout");
+        filterChainDefinitionMap.put("/static/**", "anon");
+        filterChainDefinitionMap.put("/**", "anon");//anon 可以理解为不拦截
+
+        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
+
+        return shiroFilterFactoryBean;
+    }
 
     class MyShiroRealm extends JdbcRealm {
 
@@ -143,42 +181,59 @@ public class ShiroConfig {
         return authorizationAttributeSourceAdvisor;
     }
 
-    /*@Bean
-    public ShareAuthenticationFilter authenticationFilter() {
-        return new ShareAuthenticationFilter();
-    }*/
-
-
-    /**
-     * Shiro入口过滤器
-     * @param securityManager
-     * @return
-     */
-    @Bean(name = "shiroFilter")
-    public ShiroFilterFactoryBean getShiroFilterFactoryBean(DefaultWebSecurityManager securityManager) {
-        ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
-        shiroFilterFactoryBean.setSecurityManager(securityManager);// 必须设置 SecurityManager
-        logger.info("loginUrl:" + loginUrl);
-        shiroFilterFactoryBean.setLoginUrl(loginUrl);// 如果不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面
-        shiroFilterFactoryBean.setSuccessUrl(successUrl);// 登录成功后要跳转的连接
-        shiroFilterFactoryBean.setUnauthorizedUrl(errorUrl);
-
-        /*Map<String, Filter> filters = shiroFilterFactoryBean.getFilters();
-        filters.put("authc",authenticationFilter());
-        shiroFilterFactoryBean.setFilters(filters);*/
-
-        Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
-        // authc：该过滤器下的页面必须验证后才能访问，它是Shiro内置的一个拦截器org.apache.shiro.web.filter.authc.FormAuthenticationFilter
-        logger.info("##################从数据库读取权限规则，加载到shiroFilter中##################");
-        filterChainDefinitionMap.put("/favicon.ico", "anon");
-        filterChainDefinitionMap.put("/login", "authc");
-        filterChainDefinitionMap.put("/logout", "logout");
-        filterChainDefinitionMap.put("/static/**", "anon");
-        filterChainDefinitionMap.put("/**", "anon");//anon 可以理解为不拦截
-
-        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
-
-        return shiroFilterFactoryBean;
+    @Bean
+    public MyFormAuthenticationFilter myFormAuthenticationFilter() {
+        return new MyFormAuthenticationFilter();
     }
 
+    class MyFormAuthenticationFilter extends FormAuthenticationFilter{
+        private final Logger log = LoggerFactory.getLogger(MyFormAuthenticationFilter.class);
+        @Override
+        protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
+            // 判断是否是登陆请求
+            if (isLoginRequest(request, response)) {
+                if (isLoginSubmission(request, response)) {
+                    if (log.isTraceEnabled()) {
+                        log.trace("Login submission detected.  Attempting to execute login.");
+                    }
+
+                    if ("XMLHttpRequest".equalsIgnoreCase(((HttpServletRequest) request).getHeader("X-Requested-With"))) {// 不是ajax请求
+                        String vcode = request.getParameter("vcode");
+                        HttpServletRequest httpservletrequest = (HttpServletRequest) request;
+                        String vvcode = (String) httpservletrequest.getSession().getAttribute("SESSION_CODE");
+                        if (vvcode == null || "".equals(vvcode)  || !vvcode.equals(vcode)) {
+                            response.setCharacterEncoding("UTF-8");
+                            PrintWriter out = response.getWriter();
+                            out.println("{success:false,message:'验证码错误'}");
+                            out.flush();
+                            out.close();
+                            return false;
+                        }
+                    }
+                    return executeLogin(request, response);
+                } else {
+                    if (log.isTraceEnabled()) {
+                        log.trace("Login page view.");
+                    }
+                    return true;
+                }
+            } else {
+                if (log.isTraceEnabled()) {
+                    log.trace("Attempting to access a path which requires authentication.  Forwarding to the Authentication url [" + getLoginUrl() + "]");
+                }
+
+                // 如果不是ajax请求，则返回到登陆
+                if (!"XMLHttpRequest".equalsIgnoreCase(((HttpServletRequest) request).getHeader("X-Requested-With"))) {// 不是ajax请求
+                    saveRequestAndRedirectToLogin(request, response);
+                } else {
+                    response.setCharacterEncoding("UTF-8");
+                    PrintWriter out = response.getWriter();
+                    out.print("timeout");
+                    out.flush();
+                    out.close();
+                }
+                return false;
+            }
+        }
+    }
 }
