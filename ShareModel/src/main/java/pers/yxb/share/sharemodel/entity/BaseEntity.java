@@ -3,7 +3,6 @@ package pers.yxb.share.sharemodel.entity;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import java.sql.Date;
@@ -14,7 +13,7 @@ import java.sql.Date;
 @MappedSuperclass
 public class BaseEntity {
     @Id
-    @GenericGenerator(name = "uuid", strategy = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
     @GeneratedValue(generator = "uuid")
     protected String id;
 

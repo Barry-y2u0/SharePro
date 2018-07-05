@@ -9,9 +9,11 @@ import org.apache.shiro.realm.jdbc.JdbcRealm;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ByteSource;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,15 +60,16 @@ public class ShiroConfig {
     @Bean(name = "shiroFilter")
     public ShiroFilterFactoryBean getShiroFilterFactoryBean(DefaultWebSecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
+
         shiroFilterFactoryBean.setSecurityManager(securityManager);// 必须设置 SecurityManager
-        logger.info("loginUrl:" + loginUrl);
-        shiroFilterFactoryBean.setLoginUrl(loginUrl);// 如果不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面
-        shiroFilterFactoryBean.setSuccessUrl(successUrl);// 登录成功后要跳转的连接
-        shiroFilterFactoryBean.setUnauthorizedUrl(errorUrl);
 
         Map<String, Filter> filters = shiroFilterFactoryBean.getFilters();
         filters.put("authc",myFormAuthenticationFilter());
         shiroFilterFactoryBean.setFilters(filters);
+
+        shiroFilterFactoryBean.setLoginUrl(loginUrl);// 如果不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面
+        shiroFilterFactoryBean.setSuccessUrl(successUrl);// 登录成功后要跳转的连接
+        shiroFilterFactoryBean.setUnauthorizedUrl(errorUrl);
 
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
         // authc：该过滤器下的页面必须验证后才能访问，它是Shiro内置的一个拦截器org.apache.shiro.web.filter.authc.FormAuthenticationFilter
@@ -75,7 +78,7 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/login", "authc");
         filterChainDefinitionMap.put("/logout", "logout");
         filterChainDefinitionMap.put("/static/**", "anon");
-        filterChainDefinitionMap.put("/**", "anon");//anon 可以理解为不拦截
+        filterChainDefinitionMap.put("/**", "authc");
 
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
 
@@ -132,6 +135,14 @@ public class ShiroConfig {
         }
     }
 
+    @Bean(name = "myShiroRealm")
+    public MyShiroRealm myShiroRealm(EhCacheManager cacheManager) {
+        MyShiroRealm realm = new MyShiroRealm();
+        realm.setCredentialsMatcher(hashedCredentialsMatcher());
+        realm.setCacheManager(cacheManager);
+        return realm;
+    }
+
     @Bean
     public EhCacheManager getEhCacheManager() {
         EhCacheManager em = new EhCacheManager();
@@ -150,14 +161,6 @@ public class ShiroConfig {
         matcher.setHashIterations(1024);
         matcher.setStoredCredentialsHexEncoded(true);
         return matcher;
-    }
-
-    @Bean(name = "myShiroRealm")
-    public MyShiroRealm myShiroRealm(EhCacheManager cacheManager) {
-        MyShiroRealm realm = new MyShiroRealm();
-        realm.setCredentialsMatcher(hashedCredentialsMatcher());
-        realm.setCacheManager(cacheManager);
-        return realm;
     }
 
     @Bean(name = "securityManager")
@@ -181,59 +184,98 @@ public class ShiroConfig {
         return authorizationAttributeSourceAdvisor;
     }
 
+    /**
+     * 登录过滤器内部类
+     */
+    class MyFormAuthenticationFilter extends FormAuthenticationFilter{
+        private final Logger log = LoggerFactory.getLogger(MyFormAuthenticationFilter.class);
+        public static final String DEFAULT_CAPTCHA_PARAM = "captcha";
+        private String captchaParam = DEFAULT_CAPTCHA_PARAM;
+
+        /**
+         * 登录验证
+         * @param request
+         * @param response
+         * @return
+         * @throws Exception
+         */
+        @Override
+        protected boolean executeLogin(ServletRequest request, ServletResponse response) throws Exception {
+            CaptchaUsernamePasswordToken token = createToken(request, response);
+            String username = token.getUsername();
+            try {
+                /*图形验证码验证*/
+                //session中的图形码字符串
+                String captcha = (String)((HttpServletRequest)request).getSession().getAttribute(com.google.code.kaptcha.Constants.KAPTCHA_SESSION_KEY);
+                //比对
+                if (captcha == null || !captcha.equalsIgnoreCase(token.getCaptcha())) {
+                    throw new AuthenticationException("验证码错误");
+                }
+                Subject subject = getSubject(request, response);
+                subject.login(token);//正常验证
+                //到这里就算验证成功了,把用户信息放到session中
+                ((HttpServletRequest) request).getSession().setAttribute("name",username);
+                return onLoginSuccess(token, subject, request, response);
+            }catch (AuthenticationException e) {
+                return onLoginFailure(token, e, request, response);
+            }
+        }
+
+        @Override
+        protected CaptchaUsernamePasswordToken createToken(ServletRequest request, ServletResponse response) {
+            String username = getUsername(request);
+            String password = getPassword(request);
+            String captcha = getCaptcha(request);
+            boolean rememberMe = isRememberMe(request);
+            String host = getHost(request);
+            return new CaptchaUsernamePasswordToken(username, password, rememberMe, host, captcha);
+        }
+
+
+
+        public String getCaptchaParam() {
+            return captchaParam;
+        }
+
+        public void setCaptchaParam(String captchaParam) {
+            this.captchaParam = captchaParam;
+        }
+
+        protected String getCaptcha(ServletRequest request) {
+            return WebUtils.getCleanParam(request, getCaptchaParam());
+        }
+
+        //保存异常对象到request
+        @Override
+        protected void setFailureAttribute(ServletRequest request, AuthenticationException ae) {
+            request.setAttribute(getFailureKeyAttribute(), ae);
+        }
+
+        /**
+         * 自定义token
+         */
+        class CaptchaUsernamePasswordToken extends UsernamePasswordToken {
+            private static final long serialVersionUID = 1L;
+
+            private String captcha;//验证码字符串
+
+            public CaptchaUsernamePasswordToken(String username, String password, boolean rememberMe, String host, String captcha) {
+                super(username, password, rememberMe, host);
+                this.captcha = captcha;
+            }
+
+            public String getCaptcha() {
+                return captcha;
+            }
+
+            public void setCaptcha(String captcha) {
+                this.captcha = captcha;
+            }
+        }
+    }
+
     @Bean
     public MyFormAuthenticationFilter myFormAuthenticationFilter() {
         return new MyFormAuthenticationFilter();
-    }
-
-    class MyFormAuthenticationFilter extends FormAuthenticationFilter{
-        private final Logger log = LoggerFactory.getLogger(MyFormAuthenticationFilter.class);
-        @Override
-        protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
-            // 判断是否是登陆请求
-            if (isLoginRequest(request, response)) {
-                if (isLoginSubmission(request, response)) {
-                    if (log.isTraceEnabled()) {
-                        log.trace("Login submission detected.  Attempting to execute login.");
-                    }
-
-                    if ("XMLHttpRequest".equalsIgnoreCase(((HttpServletRequest) request).getHeader("X-Requested-With"))) {// 不是ajax请求
-                        String vcode = request.getParameter("vcode");
-                        HttpServletRequest httpservletrequest = (HttpServletRequest) request;
-                        String vvcode = (String) httpservletrequest.getSession().getAttribute("SESSION_CODE");
-                        if (vvcode == null || "".equals(vvcode)  || !vvcode.equals(vcode)) {
-                            response.setCharacterEncoding("UTF-8");
-                            PrintWriter out = response.getWriter();
-                            out.println("{success:false,message:'验证码错误'}");
-                            out.flush();
-                            out.close();
-                            return false;
-                        }
-                    }
-                    return executeLogin(request, response);
-                } else {
-                    if (log.isTraceEnabled()) {
-                        log.trace("Login page view.");
-                    }
-                    return true;
-                }
-            } else {
-                if (log.isTraceEnabled()) {
-                    log.trace("Attempting to access a path which requires authentication.  Forwarding to the Authentication url [" + getLoginUrl() + "]");
-                }
-
-                // 如果不是ajax请求，则返回到登陆
-                if (!"XMLHttpRequest".equalsIgnoreCase(((HttpServletRequest) request).getHeader("X-Requested-With"))) {// 不是ajax请求
-                    saveRequestAndRedirectToLogin(request, response);
-                } else {
-                    response.setCharacterEncoding("UTF-8");
-                    PrintWriter out = response.getWriter();
-                    out.print("timeout");
-                    out.flush();
-                    out.close();
-                }
-                return false;
-            }
-        }
     }
 }
