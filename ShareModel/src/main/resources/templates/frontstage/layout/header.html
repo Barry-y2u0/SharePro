@@ -24,36 +24,27 @@
             <div class="container">
                 <div class="row">
                     <div class="col-sm-12">
-                        <h2 class="text-center text-uppercase last">Lorem ipsum dolor sit amet consectetur </h2>
-                        <p class="text-center last">Lorem ipsum dolor sit amet in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                        <div class="search-panel">
-                            <form class="form-inline" role="form" action="/login" method="post">
-                                <div class="form-group">
-                                    <input id="dity" type="text" class="form-control" placeholder="City" autocomplete="off"/>
-                                </div>
-                                <div class="form-group hidden-xs adv">
-                                    <div class="input-group">
-                                        <div class="input-group-addon">$</div>
-                                        <input class="form-control price" type="text" placeholder="From">
-                                    </div>
-                                </div>
-                                <div class="form-group hidden-xs adv">
-                                    <div class="input-group">
-                                        <div class="input-group-addon">$</div>
-                                        <input class="form-control price" type="text" placeholder="To">
-                                    </div>
-                                </div>
-                                <div class="form-group hidden-xs adv">
-                                    <div class="checkbox custom-checkbox"><label><input type="checkbox"><span class="fa fa-check"></span> For Rent</label></div>
-                                </div>
-                                <div class="form-group hidden-xs adv">
-                                    <div class="checkbox custom-checkbox"><label><input type="checkbox"><span class="fa fa-check"></span> For Sale</label></div>
-                                </div>
-                                <div class="form-group">
-                                    <a href="" class="btn btnsearch">Search</a>
-                                </div>
-                            </form>
-                        </div>
+                        <form class="form-inline col-sm-offset-3" role="form" id="login_form" th:action="@{/login}" method="post">
+                            <div class="form-group">
+                                <label class="sr-only" for="username">Username</label>
+                                <input class="form-control" type="text" id="username" name="username" placeholder="Username"/>
+                            </div>
+                            <div class="form-group">
+                                <label class="sr-only" for="password">Password</label>
+                                <input class="form-control" type="password" id="password" name="password" placeholder="Password"/>
+                            </div>
+                            <div class="form-group">
+                                <label class="sr-only" for="password">Password</label>
+                                <input class="form-control" type="text" id="captcha" name="captcha" style="width: 100px;"/>
+                                <img th:src="@{/defaultKaptcha}" title="Refresh" id="kaptcha-img" onclick="this.src='/defaultKaptcha?d='+new Date()*1">
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"> Remember me
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-default">Sign in</button>
+                        </form>
                     </div>
                 </div>
             </div>
