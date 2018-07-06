@@ -18,7 +18,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Autowired
     private ISysUserDao userDao;
 
-    @TargetDataSource("ds1")
+    //@TargetDataSource("ds1")
     public SysUser findByUsername(String username) {
         System.out.println("++++++++++++++++call method findByUsername");
         return userDao.findByUsername(username);

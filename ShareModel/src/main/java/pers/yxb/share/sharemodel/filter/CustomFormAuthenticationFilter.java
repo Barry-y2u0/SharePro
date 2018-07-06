@@ -7,6 +7,7 @@ import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pers.yxb.share.sharemodel.exception.ShareException;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -36,15 +37,14 @@ public class CustomFormAuthenticationFilter extends FormAuthenticationFilter {
         try {
             /*图形验证码验证*/
             //session中的图形码字符串
-            String captcha = (String)((HttpServletRequest)request).getSession().getAttribute(com.google.code.kaptcha.Constants.KAPTCHA_SESSION_KEY);
-            //比对
+            /*String captcha = (String)((HttpServletRequest)request).getSession().getAttribute(com.google.code.kaptcha.Constants.KAPTCHA_SESSION_KEY);
             if (captcha == null || !captcha.equalsIgnoreCase(token.getCaptcha())) {
-                throw new AuthenticationException("验证码错误");
-            }
+                throw new ShareException("验证码错误");
+            }*/
             Subject subject = getSubject(request, response);
             subject.login(token);//正常验证
             //到这里就算验证成功了,把用户信息放到session中
-            ((HttpServletRequest) request).getSession().setAttribute("name",username);
+            ((HttpServletRequest) request).getSession().setAttribute("username",username);
             return onLoginSuccess(token, subject, request, response);
         }catch (AuthenticationException e) {
             return onLoginFailure(token, e, request, response);
@@ -73,12 +73,6 @@ public class CustomFormAuthenticationFilter extends FormAuthenticationFilter {
 
     protected String getCaptcha(ServletRequest request) {
         return WebUtils.getCleanParam(request, getCaptchaParam());
-    }
-
-    //保存异常对象到request
-    @Override
-    protected void setFailureAttribute(ServletRequest request, AuthenticationException ae) {
-        request.setAttribute(getFailureKeyAttribute(), ae);
     }
 
     /**
