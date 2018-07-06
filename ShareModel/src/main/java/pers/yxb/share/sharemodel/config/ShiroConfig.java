@@ -9,11 +9,8 @@ import org.apache.shiro.realm.jdbc.JdbcRealm;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ByteSource;
-import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +21,10 @@ import org.springframework.core.annotation.Order;
 import pers.yxb.share.sharemodel.entity.SysOrganization;
 import pers.yxb.share.sharemodel.entity.SysRole;
 import pers.yxb.share.sharemodel.entity.SysUser;
+import pers.yxb.share.sharemodel.filter.CustomFormAuthenticationFilter;
 import pers.yxb.share.sharemodel.service.ISysUserService;
 
 import javax.servlet.Filter;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -64,21 +58,28 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setSecurityManager(securityManager);// 必须设置 SecurityManager
 
         Map<String, Filter> filters = shiroFilterFactoryBean.getFilters();
-        filters.put("authc",myFormAuthenticationFilter());
+        CustomFormAuthenticationFilter formAuthenticationFilter = new CustomFormAuthenticationFilter();
+        filters.put("authc",formAuthenticationFilter);
         shiroFilterFactoryBean.setFilters(filters);
 
         shiroFilterFactoryBean.setLoginUrl(loginUrl);// 如果不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面
         shiroFilterFactoryBean.setSuccessUrl(successUrl);// 登录成功后要跳转的连接
         shiroFilterFactoryBean.setUnauthorizedUrl(errorUrl);
 
-        Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
+        Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
         // authc：该过滤器下的页面必须验证后才能访问，它是Shiro内置的一个拦截器org.apache.shiro.web.filter.authc.FormAuthenticationFilter
         logger.info("##################从数据库读取权限规则，加载到shiroFilter中##################");
         filterChainDefinitionMap.put("/favicon.ico", "anon");
+        filterChainDefinitionMap.put("/webjars/**", "anon");
+        filterChainDefinitionMap.put("/css/**", "anon");
+        filterChainDefinitionMap.put("/images/**", "anon");
+        filterChainDefinitionMap.put("/js/**", "anon");
+        filterChainDefinitionMap.put("/ref/**", "anon");
         filterChainDefinitionMap.put("/login", "authc");
         filterChainDefinitionMap.put("/logout", "logout");
-        filterChainDefinitionMap.put("/static/**", "anon");
+
         filterChainDefinitionMap.put("/**", "authc");
+
 
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
 
@@ -182,100 +183,5 @@ public class ShiroConfig {
         AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
         authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
         return authorizationAttributeSourceAdvisor;
-    }
-
-    /**
-     * 登录过滤器内部类
-     */
-    class MyFormAuthenticationFilter extends FormAuthenticationFilter{
-        private final Logger log = LoggerFactory.getLogger(MyFormAuthenticationFilter.class);
-        public static final String DEFAULT_CAPTCHA_PARAM = "captcha";
-        private String captchaParam = DEFAULT_CAPTCHA_PARAM;
-
-        /**
-         * 登录验证
-         * @param request
-         * @param response
-         * @return
-         * @throws Exception
-         */
-        @Override
-        protected boolean executeLogin(ServletRequest request, ServletResponse response) throws Exception {
-            CaptchaUsernamePasswordToken token = createToken(request, response);
-            String username = token.getUsername();
-            try {
-                /*图形验证码验证*/
-                //session中的图形码字符串
-                String captcha = (String)((HttpServletRequest)request).getSession().getAttribute(com.google.code.kaptcha.Constants.KAPTCHA_SESSION_KEY);
-                //比对
-                if (captcha == null || !captcha.equalsIgnoreCase(token.getCaptcha())) {
-                    throw new AuthenticationException("验证码错误");
-                }
-                Subject subject = getSubject(request, response);
-                subject.login(token);//正常验证
-                //到这里就算验证成功了,把用户信息放到session中
-                ((HttpServletRequest) request).getSession().setAttribute("name",username);
-                return onLoginSuccess(token, subject, request, response);
-            }catch (AuthenticationException e) {
-                return onLoginFailure(token, e, request, response);
-            }
-        }
-
-        @Override
-        protected CaptchaUsernamePasswordToken createToken(ServletRequest request, ServletResponse response) {
-            String username = getUsername(request);
-            String password = getPassword(request);
-            String captcha = getCaptcha(request);
-            boolean rememberMe = isRememberMe(request);
-            String host = getHost(request);
-            return new CaptchaUsernamePasswordToken(username, password, rememberMe, host, captcha);
-        }
-
-
-
-        public String getCaptchaParam() {
-            return captchaParam;
-        }
-
-        public void setCaptchaParam(String captchaParam) {
-            this.captchaParam = captchaParam;
-        }
-
-        protected String getCaptcha(ServletRequest request) {
-            return WebUtils.getCleanParam(request, getCaptchaParam());
-        }
-
-        //保存异常对象到request
-        @Override
-        protected void setFailureAttribute(ServletRequest request, AuthenticationException ae) {
-            request.setAttribute(getFailureKeyAttribute(), ae);
-        }
-
-        /**
-         * 自定义token
-         */
-        class CaptchaUsernamePasswordToken extends UsernamePasswordToken {
-            private static final long serialVersionUID = 1L;
-
-            private String captcha;//验证码字符串
-
-            public CaptchaUsernamePasswordToken(String username, String password, boolean rememberMe, String host, String captcha) {
-                super(username, password, rememberMe, host);
-                this.captcha = captcha;
-            }
-
-            public String getCaptcha() {
-                return captcha;
-            }
-
-            public void setCaptcha(String captcha) {
-                this.captcha = captcha;
-            }
-        }
-    }
-
-    @Bean
-    public MyFormAuthenticationFilter myFormAuthenticationFilter() {
-        return new MyFormAuthenticationFilter();
     }
 }
