@@ -7,42 +7,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>YBB个人网站</title>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" th:href="@{/webjars/metisMenu/metisMenu.min.css}"/>
+    <!--<link rel="stylesheet" th:href="@{/css/back.style.css}"/>-->
 
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
-
-    <!--jquery pluges camera-->
-    <link rel="stylesheet" th:href="@{/ref/camera/css/camera.css}"/>
-    <script th:src="@{/ref/camera/scripts/jquery.min.js}"></script>
-    <script type="text/javascript">
-        var _$_camera = $.noConflict(true);
-    </script>
-    <script th:src="@{/ref/camera/scripts/jquery.mobile.customized.min.js}"></script>
-    <script th:src="@{/ref/camera/scripts/jquery.easing.1.3.js}"></script>
-    <script th:src="@{/ref/camera/scripts/camera.min.js}"></script>
-
-
+    <script th:src="@{/webjars/metisMenu/metisMenu.min.js}"></script>
+    <!--<script th:src="@{/js/back.js}"></script>-->
 </head>
 <body>
-<div th:replace="/frontstage/layout/header :: header"></div>
-<div th:replace="/frontstage/layout/header :: header-nav"></div>
-<div class="" layout:fragment="content">
+    <!--header-->
+    <div th:replace="/backstage/layout/header :: header"></div>
 
-</div>
-<div th:replace="/frontstage/layout/footer :: footer"></div>
-<script>
-    $(document).ready(function() {
-        var navoffeset=$(".header-nav").offset().top;
-        $(window).scroll(function(){
-            var scrollpos=$(window).scrollTop();
-            if(scrollpos >=navoffeset){
-                $(".header-nav").addClass("fixed");
-            }else{
-                $(".header-nav").removeClass("fixed");
-            }
-        });
-    });
-</script>
+    <!--leaft-->
+    <div th:replace="/backstage/layout/aside :: aside"></div>
+    <!-- begin side-collapse-visible bar -->
+    <div class="side-visible-line hidden-xs" data-side="collapse">
+        <i class="fa fa-caret-left"></i>
+    </div>
+
+    <!--main-->
+    <div class="" layout:fragment="content"></div>
+
+    <!--footer-->
+    <div th:replace="/backstage/layout/footer :: footer"></div>
 </body>
 </html>
