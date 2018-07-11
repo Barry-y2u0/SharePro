@@ -6,6 +6,7 @@ import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -30,7 +31,7 @@ public class IndexController extends BaseController {
     @Autowired
     private Producer kaptchaProducer;
 
-    @RequestMapping("/login")
+    @GetMapping("/login")
     public String home() {
         return "frontstage/home";
     }
@@ -86,8 +87,12 @@ public class IndexController extends BaseController {
         }
         System.out.println("++++++++++++++++" + msg);
         map.put("msg", msg);
-        // 此方法不处理登录成功,由shiro进行处理.
         return "frontstage/home";
+    }
+
+    @RequestMapping("/")
+    public String redirectIndex() {
+        return "redirect:/index";
     }
 
     /**

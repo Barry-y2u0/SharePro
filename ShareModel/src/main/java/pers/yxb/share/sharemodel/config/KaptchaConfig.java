@@ -26,7 +26,8 @@ public class KaptchaConfig {
         properties.setProperty("kaptcha.textproducer.font.size", "28");
         properties.setProperty("kaptcha.session.key", "code");
         properties.setProperty("kaptcha.textproducer.char.length", "4");
-        properties.setProperty("kaptcha.textproducer.font.names", "宋体,楷体,微软雅黑");
+        properties.setProperty("kaptcha.textproducer.font.names", "Console");
+        properties.setProperty("kaptcha.textproducer.font.size", "25");
         Config config = new Config(properties);
         defaultKaptcha.setConfig(config);
         return defaultKaptcha;
