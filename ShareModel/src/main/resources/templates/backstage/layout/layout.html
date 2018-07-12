@@ -8,7 +8,7 @@
     <title>YBB个人网站</title>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
     <link rel="stylesheet" th:href="@{/webjars/metisMenu/metisMenu.min.css}"/>
-    <!--<link rel="stylesheet" th:href="@{/css/back.style.css}"/>-->
+    <link rel="stylesheet" th:href="@{/css/back.style.css}"/>
 
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
@@ -19,15 +19,18 @@
     <!--header-->
     <div th:replace="/backstage/layout/header :: header"></div>
 
-    <!--leaft-->
-    <div th:replace="/backstage/layout/aside :: aside"></div>
-    <!-- begin side-collapse-visible bar -->
-    <div class="side-visible-line hidden-xs" data-side="collapse">
-        <i class="fa fa-caret-left"></i>
+    <div class="container-fluid">
+        <div class="row">
+            <!--leaft-->
+            <div th:replace="/backstage/layout/aside :: aside"></div>
+            <!-- begin side-collapse-visible bar -->
+            <div class="side-visible-line hidden-xs" data-side="collapse">
+                <i class="fa fa-caret-left"></i>
+            </div>
+            <!--main-->
+            <div class="col-md-8" layout:fragment="content"></div>
+        </div>
     </div>
-
-    <!--main-->
-    <div class="" layout:fragment="content"></div>
 
     <!--footer-->
     <div th:replace="/backstage/layout/footer :: footer"></div>

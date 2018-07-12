@@ -1,24 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-    <aside th:fragment="aside">
+    <aside th:fragment="aside" class="side col-md-3">
         <div class="side-content">
-            <!-- END: user-panel -->
-            <nav class="main-sidebar hidden-print" data-plugin="metismenu">
+            <button type="button" class="btn btn-default" aria-label="Left Align" style="width: 100%;">
+                <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
+            </button>
+            <nav class="sidebar-nav">
                 <!-- Sidebar Menu-->
-                <ul class="metismenu nav nav-inverse nav-bordered nav-stacked" id="menu">
+                <ul class="metismenu nav nav-inverse nav-bordered nav-stacked" data-plugin="metismenu" id="menu">
                     <li class="nav-header">MAIN</li>
                     <li>
-                        <a class="active" href="index.html">
-                            <span class="nav-icon">
-                                <i class="fa fa-fw fa-cogs"></i>
-                            </span>
+                        <a class="active" href="#">
+                            <span class="glyphicon-list-alt"></span>
                             <span class="nav-title">Dashboard</span>
                         </a>
                     </li>
-
                     <li class="nav-divider"></li>
                     <li class="nav-header">Components</li>
-
                     <!-- BEGIN: chart -->
                     <li>
                         <a href="javascript:;">
@@ -76,7 +74,6 @@
                     <!-- BEGIN: ui -->
                     <li>
                         <a href="javascript:;">
-
                             <span class="nav-icon">
                                 <i class="fa fa-fw fa-tachometer"></i>
                             </span>
@@ -86,42 +83,6 @@
                             </span>
                         </a>
                         <ul class="nav nav-sub nav-stacked">
-                            <li>
-                                <a href="ui-general.html">General</a>
-                            </li>
-                            <li>
-                                <a href="ui-font.html">Font</a>
-                            </li>
-                            <li>
-                                <a href="ui-widgets.html">Widgets</a>
-                            </li>
-                            <li>
-                                <a href="ui-loaders.html">Loaders</a>
-                            </li>
-                            <li>
-                                <a href="ui-momentum.html">Momentum</a>
-                            </li>
-                            <li>
-                                <a href="ui-nav.html">Nav</a>
-                            </li>
-                            <li>
-                                <a href="ui-todo.html">Todo</a>
-                            </li>
-                            <li>
-                                <a href="ui-mega.html">Mega Menu</a>
-                            </li>
-                            <li>
-                                <a href="ui-tab.html">Tab</a>
-                            </li>
-                            <li>
-                                <a href="ui-color.html">Colors</a>
-                            </li>
-                            <li>
-                                <a href="ui-button.html">Buttons</a>
-                            </li>
-                            <li>
-                                <a href="ui-canvas.html">Canvas</a>
-                            </li>
                             <li>
                                 <a href="ui-slider.html">Slider</a>
                             </li>
@@ -160,286 +121,13 @@
                         </ul>
                     </li>
                     <!-- END: ui -->
-
-                    <!-- BEGIN: forms -->
-                    <li>
-                        <a href="javascript:;">
-                            <span class="nav-icon">
-                                <i class="fa fa-fw fa-edit"></i>
-                            </span>
-                            <span class="nav-title">Forms</span>
-                            <span class="nav-tools">
-                                <i class="fa fa-fw arrow"></i>
-                            </span>
-                        </a>
-                        <ul class="nav nav-sub nav-stacked">
-                            <li>
-                                <a href="form-basic.html">Basic</a>
-                            </li>
-                            <li>
-                                <a href="form-advanced.html">Advanced</a>
-                            </li>
-                            <li>
-                                <a href="form-wizard.html">Wizard</a>
-                            </li>
-                            <li>
-                                <a href="form-upload.html">File Upload</a>
-                            </li>
-                            <li>
-                                <a href="form-editor.html">Text Editor</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <!-- END: forms -->
-
-                    <!-- BEGIN: table -->
-                    <li>
-                        <a href="javascript:;">
-                            <span class="nav-icon">
-                                <i class="fa fa-fw fa-table"></i>
-                            </span>
-                            <span class="nav-title">Table</span>
-                            <span class="nav-tools">
-                                <i class="fa fa-fw arrow"></i>
-                            </span>
-                        </a>
-                        <ul class="nav nav-sub nav-stacked">
-                            <li>
-                                <a href="table-basic.html">Basic</a>
-                            </li>
-                            <li>
-                                <a href="table-sortable.html">Sortable</a>
-                            </li>
-                            <li>
-                                <a href="table-datatable.html">Datatables</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <!-- END: table -->
-
-                    <!-- BEGIN: apps -->
-                    <li>
-                        <a href="javascript:;">
-                            <span class="nav-icon">
-                                <i class="fa fa-fw fa-pagelines"></i>
-                            </span>
-                            <span class="nav-title">App</span>
-                            <span class="nav-tools">
-                                <i class="fa fa-fw arrow"></i>
-                            </span>
-                        </a>
-                        <ul class="nav nav-sub nav-stacked">
-                            <li>
-                                <a href="app-calendar.html">Calendar</a>
-                            </li>
-                            <li>
-                                <a href="app-gallery.html">Gallery</a>
-                            </li>
-                            <li>
-                                <a href="app-login.html">Login</a>
-                            </li>
-                            <li>
-                                <a href="app-register.html">Register</a>
-                            </li>
-                            <li>
-                                <a href="app-forgot.html">Forgot</a>
-                            </li>
-                            <li>
-                                <a href="app-404.html">404</a>
-                            </li>
-                            <li>
-                                <a href="app-500.html">500</a>
-                            </li>
-
-                            <!-- BEGIN: mail -->
-                            <li>
-                                <a href="javascript:;">
-                                    <span class="nav-icon">
-                                        <i class="fa fa-fw fa-envelope-o"></i>
-                                    </span>
-                                    <span class="nav-title">Mail</span>
-                                    <span class="nav-tools">
-                                        <i class="fa fa-fw arrow"></i>
-                                    </span>
-                                </a>
-                                <ul class="nav nav-sub nav-stacked">
-                                    <li>
-                                        <a href="app-mail-inbox.html">Inbox</a>
-                                    </li>
-                                    <li>
-                                        <a href="app-mail-compose.html">Compose</a>
-                                    </li>
-                                    <li>
-                                        <a href="app-mail-read.html">Read</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <!-- END: mail -->
-                        </ul>
-                    </li>
-                    <!-- BEGIN: apps -->
-
-                    <!-- BEGIN: blank pages -->
-                    <li>
-                        <a href="javascript:;">
-                            <span class="nav-icon">
-                                <i class="fa fa-fw fa-square-o"></i>
-                            </span>
-                            <span class="nav-title">Blank Pages</span>
-                            <span class="nav-tools">
-                                <i class="fa fa-fw arrow"></i>
-                            </span>
-                        </a>
-                        <ul class="nav nav-sub nav-stacked">
-                            <li>
-                                <a href="blank-one-col.html">One Column Content</a>
-                            </li>
-                            <li>
-                                <a href="blank-two-col-1.html">Two Column Content 1</a>
-                            </li>
-                            <li>
-                                <a href="blank-two-col-2.html">Two Column Content 2</a>
-                            </li>
-                            <li>
-                                <a href="blank-three-col-1.html">Three Column Content 1</a>
-                            </li>
-                            <li>
-                                <a href="blank-three-col-2.html">Three Column Content 2</a>
-                            </li>
-                            <li>
-                                <a href="blank-three-col-3.html">Three Column Content 3</a>
-                            </li>
-                            <li>
-                                <a href="blank-four-col.html">Four Column Content</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <!-- END: blank pages -->
-
-                    <li class="nav-divider"></li>
-
-                    <!-- BEGIN: utility -->
-                    <li>
-                        <a href="javascript:;">
-                            <span class="nav-icon">
-                                <i class="fa fa-fw fa-wrench"></i>
-                            </span>
-                            <span class="nav-title">Utility</span>
-                            <span class="nav-tools">
-                                <i class="fa fa-fw arrow"></i>
-                            </span>
-                        </a>
-                        <ul class="nav nav-sub nav-stacked">
-                            <li>
-                                <a href="u-spacing.html">Spacing</a>
-                            </li>
-                            <li>
-                                <a href="u-border.html">Border</a>
-                            </li>
-                            <li>
-                                <a href="u-overflow.html">Overflow</a>
-                            </li>
-                            <li>
-                                <a href="u-display.html">Display</a>
-                            </li>
-                            <li>
-                                <a href="u-flex.html">Flexbox</a>
-                            </li>
-                            <li>
-                                <a href="u-shadow.html">Shadow</a>
-                            </li>
-                            <li>
-                                <a href="u-waves.html">Waves Effect</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <!-- BEGIN: utility -->
-
-                    <li>
-                        <a href="javascript:;">
-                            <span class="nav-icon">
-                                <i class="fa fa-fw fa-code"></i>
-                            </span>
-                            <span class="nav-title">Multilevel</span>
-                            <span class="nav-tools">
-                                <i class="fa fa-fw arrow"></i>
-                            </span>
-                        </a>
-                        <ul class="nav nav-sub">
-                            <li>
-                                <a href="javascript:;">
-                                    <span class="nav-title">Level 1</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:;">
-                                    <span class="nav-title">Level 1</span>
-                                    <span class="nav-tools">
-                                        <i class="fa fa-fw arrow"></i>
-                                    </span>
-                                </a>
-                                <ul class="nav nav-sub">
-                                    <li>
-                                        <a href="javascript:;">
-                                            <span class="nav-title">Level 2</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;">
-                                            <span class="nav-title">Level 2</span>
-                                            <span class="nav-tools">
-                                                <i class="fa fa-fw arrow"></i>
-                                            </span>
-                                        </a>
-                                        <ul class="nav nav-sub">
-                                            <li>
-                                                <a href="javascript:;">
-                                                    <span class="nav-title">Level 3</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:;">
-                                                    <span class="nav-title">Level 3</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="javascript:;">
-                                    <span class="nav-title">Level 1</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li class="nav-divider"></li>
-
-                    <li>
-                        <a href="document.html">
-                            <span class="nav-icon">
-                                <i class="fa fa-fw fa-book text-alizarin"></i>
-                            </span>
-                            <span class="nav-title">Document</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="../firstrtl/index.html">
-                            <span class="nav-icon">
-                                <i class="fa fa-fw fa-angle-double-left text-emerland"></i>
-                            </span>
-                            <span class="nav-title">RTL</span>
-                        </a>
-                    </li>
                 </ul>
             </nav>
         </div>
+        <script>
+            $(function () {
+                $('#menu').metisMenu();
+            });
+        </script>
     </aside>
-    <script>
-        $(function () {
-            $('#menu').metisMenu();
-        });
-    </script>
 </html>
