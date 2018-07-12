@@ -1,8 +1,0 @@
-.left{
-    position: relative;
-    float: left;
-    left: auto;
-    transition: all .3s ease-in-out;
-    width: 250px;
-    z-index: 999;
-}
