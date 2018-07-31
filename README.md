@@ -6,7 +6,7 @@
 三、系统功能结构图  
 <img src="https://github.com/Yuxuebing/SharePro/blob/master/doc/imageCache/%E9%80%9A%E7%94%A8%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F-%E5%8A%9F%E8%83%BD%E7%BB%93%E6%9E%84%E5%9B%BE.jpg" width="550" height="350" alt="系统功能结构图"/>  
 四、UI设计稿  
-<img src="https://github.com/Yuxuebing/SharePro/blob/master/doc/imageCache/%E9%97%A8%E6%88%B7%E7%95%8C%E9%9D%A2.png" width="400" height="300" alt="门户界面"/> 
+<img src="https://github.com/Yuxuebing/SharePro/blob/master/doc/imageCache/%E9%97%A8%E6%88%B7%E7%95%8C%E9%9D%A2.png" width="400" height="300" alt="门户界面"/>  
 五、数据库设计稿  
 六、技术选型  
 七、开发环境  
