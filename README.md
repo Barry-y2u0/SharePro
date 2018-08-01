@@ -11,3 +11,8 @@
 <img src="https://github.com/Yuxuebing/SharePro/blob/master/doc/imageCache/%E9%80%9A%E7%94%A8%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1.png" width="500" height="400" alt="数据库设计稿"/>  
 六、技术选型  
 七、开发环境  
+.语言：JAVA  
+.IDE：IDEA  
+.依赖管理：Maven  
+.数据库：MySQL  
+.版本管理：Git  
